@@ -75,6 +75,7 @@ module.exports = grammar({
     [$.assignment_pattern, $.assignment_expression],
     [$.computed_property_name, $.array],
     [$._for_header, $._expression],
+    [$.new_expression, $.call_expression],
   ],
 
   word: $ => $.identifier,
@@ -633,7 +634,7 @@ module.exports = grammar({
     new_expression: $ => prec(PREC.NEW, seq(
       'new',
       field('constructor', $._expression),
-      field('arguments', optional($.arguments))
+      field('arguments', optional(prec.dynamic(1, $.arguments)))
     )),
 
     _constructable_expression: $ => choice(

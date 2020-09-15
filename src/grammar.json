@@ -2749,8 +2749,12 @@
               "type": "CHOICE",
               "members": [
                 {
-                  "type": "SYMBOL",
-                  "name": "arguments"
+                  "type": "PREC_DYNAMIC",
+                  "value": 1,
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "arguments"
+                  }
                 },
                 {
                   "type": "BLANK"
@@ -5923,6 +5927,10 @@
     [
       "_for_header",
       "_expression"
+    ],
+    [
+      "new_expression",
+      "call_expression"
     ]
   ],
   "externals": [
