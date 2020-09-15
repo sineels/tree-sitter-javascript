@@ -2739,7 +2739,7 @@
             "name": "constructor",
             "content": {
               "type": "SYMBOL",
-              "name": "_constructable_expression"
+              "name": "_expression"
             }
           },
           {
