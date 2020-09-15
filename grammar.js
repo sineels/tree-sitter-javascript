@@ -625,7 +625,7 @@ module.exports = grammar({
     ),
 
     call_expression: $ => prec(PREC.CALL, seq(
-      field('function', choice($._expression, $.super, $.function)),
+      field('function', $._expression),
       optional('?.'),
       field('arguments', choice($.arguments, $.template_string))
     )),
@@ -639,6 +639,7 @@ module.exports = grammar({
     _constructable_expression: $ => choice(
       // Primary Expression
       $.this,
+      $.super,
       $.identifier,
       alias($._reserved_identifier, $.identifier),
       $.number,
@@ -669,23 +670,13 @@ module.exports = grammar({
     ),
 
     member_expression: $ => prec(PREC.MEMBER, seq(
-      field('object', choice(
-        $._expression,
-        $.identifier,
-        $.super,
-        alias($._reserved_identifier, $.identifier)
-      )),
+      field('object', $._expression),
       choice('.', '?.'),
       field('property', alias($.identifier, $.property_identifier))
     )),
 
     subscript_expression: $ => prec.right(PREC.MEMBER, seq(
-      field('object', choice(
-        $._expression,
-        $.identifier,
-        $.super,
-        alias($._reserved_identifier, $.identifier)
-      )),
+      field('object', $._expression),
       optional('?.'),
       '[',
       field('index', $._expressions),

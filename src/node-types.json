@@ -148,6 +148,10 @@
         "named": true
       },
       {
+        "type": "super",
+        "named": true
+      },
+      {
         "type": "template_string",
         "named": true
       },
@@ -661,10 +665,6 @@
         "types": [
           {
             "type": "_expression",
-            "named": true
-          },
-          {
-            "type": "super",
             "named": true
           }
         ]
@@ -1763,10 +1763,6 @@
           {
             "type": "_expression",
             "named": true
-          },
-          {
-            "type": "super",
-            "named": true
           }
         ]
       },
@@ -1982,6 +1978,10 @@
           },
           {
             "type": "subscript_expression",
+            "named": true
+          },
+          {
+            "type": "super",
             "named": true
           },
           {
@@ -2343,10 +2343,6 @@
         "types": [
           {
             "type": "_expression",
-            "named": true
-          },
-          {
-            "type": "super",
             "named": true
           }
         ]
