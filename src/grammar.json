@@ -2725,8 +2725,8 @@
       }
     },
     "new_expression": {
-      "type": "PREC_RIGHT",
-      "value": 13,
+      "type": "PREC",
+      "value": 12,
       "content": {
         "type": "SEQ",
         "members": [

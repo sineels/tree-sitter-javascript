@@ -20,7 +20,7 @@ const PREC = {
   NEG: 10,
   INC: 11,
   CALL: 12,
-  NEW: 13,
+  NEW: 12,
   MEMBER: 14
 };
 
@@ -630,7 +630,7 @@ module.exports = grammar({
       field('arguments', choice($.arguments, $.template_string))
     )),
 
-    new_expression: $ => prec.right(PREC.NEW, seq(
+    new_expression: $ => prec(PREC.NEW, seq(
       'new',
       field('constructor', $._expression),
       field('arguments', optional($.arguments))
