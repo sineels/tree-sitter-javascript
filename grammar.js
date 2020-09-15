@@ -626,7 +626,8 @@ module.exports = grammar({
 
     call_expression: $ => prec(PREC.CALL, seq(
       field('function', choice($._expression, $.super, $.function)),
-      field('arguments', choice($.arguments, $.opt_arguments, $.template_string))
+      optional('?.'),
+      field('arguments', choice($.arguments, $.template_string))
     )),
 
     new_expression: $ => prec.right(PREC.NEW, seq(
@@ -947,13 +948,6 @@ module.exports = grammar({
     //
 
     arguments: $ => prec(PREC.CALL, seq(
-      '(',
-      commaSep(optional(choice($._expression, $.spread_element))),
-      ')'
-    )),
-
-    opt_arguments: $ => prec(PREC.CALL, seq(
-      '?.',
       '(',
       commaSep(optional(choice($._expression, $.spread_element))),
       ')'

@@ -650,10 +650,6 @@
             "named": true
           },
           {
-            "type": "opt_arguments",
-            "named": true
-          },
-          {
             "type": "template_string",
             "named": true
           }
@@ -2061,25 +2057,6 @@
         },
         {
           "type": "shorthand_property_identifier",
-          "named": true
-        },
-        {
-          "type": "spread_element",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "opt_arguments",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "_expression",
           "named": true
         },
         {
