@@ -1036,13 +1036,16 @@ module.exports = grammar({
       ')'
     ),
 
-    pattern: $ => choice(
+    // This negative dynamic precedence ensures that during error recovery,
+    // unfinished constructs are generally treated as literal expressions,
+    // not patterns.
+    pattern: $ => prec.dynamic(-1, choice(
       $.identifier,
       alias($._reserved_identifier, $.identifier),
       $._destructuring_pattern,
       $.assignment_pattern,
       $.rest_parameter
-    ),
+    )),
 
     rest_parameter: $ => seq(
       '...',
