@@ -60,6 +60,7 @@ module.exports = grammar({
     ['declaration', 'literal'],
     ['primary_expr', 'block', 'object'],
     ['import_statement', 'import_expr'],
+    ['export_statement', 'primary_expr']
   ],
 
   conflicts: $ => [
@@ -75,7 +76,6 @@ module.exports = grammar({
     [$.assignment_expression, $.pattern],
     [$.assignment_expression, $.rest_parameter],
     [$.assignment_expression, $.object_assignment_pattern],
-    [$.assignment_expression, $.assignment_pattern],
     [$.labeled_statement, $._property_name],
     [$.computed_property_name, $.array],
   ],
@@ -94,7 +94,7 @@ module.exports = grammar({
     // Export declarations
     //
 
-    export_statement: $ => choice(
+    export_statement: $ => prec('export_statement', choice(
       seq(
         'export',
         choice(
@@ -115,7 +115,7 @@ module.exports = grammar({
           )
         )
       ),
-    ),
+    )),
 
     export_clause: $ => seq(
       '{',
@@ -1095,6 +1095,7 @@ module.exports = grammar({
       'set',
       'async',
       'static',
+      'export'
     ),
 
     _semicolon: $ => choice($._automatic_semicolon, ';')
