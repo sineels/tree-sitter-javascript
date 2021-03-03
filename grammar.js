@@ -21,6 +21,7 @@ module.exports = grammar({
 
   inline: $ => [
     $._call_signature,
+    $._formal_parameter,
     $._statement,
     $._expressions,
     $._semicolon,
@@ -54,13 +55,20 @@ module.exports = grammar({
       'sequence',
       'arrow',
     ],
+    [
+      'binary_in',
+      'await',
+      'arrow',
+    ],
+    ['rest', 'assign'],
     ['assign', 'primary_expr'],
     ['call', 'await', 'arrow'],
     ['member', 'new', 'call', 'expr'],
     ['declaration', 'literal'],
     ['primary_expr', 'block', 'object'],
     ['import_statement', 'import_expr'],
-    ['export_statement', 'primary_expr']
+    ['export_statement', 'primary_expr'],
+    ['pattern'],
   ],
 
   conflicts: $ => [
@@ -68,13 +76,12 @@ module.exports = grammar({
     [$.primary_expression, $._property_name, $.arrow_function],
     [$.primary_expression, $.arrow_function],
     [$.primary_expression, $.method_definition],
-    [$.primary_expression, $.rest_parameter],
+    [$.primary_expression, $.rest_pattern],
     [$.primary_expression, $.pattern],
     [$.primary_expression, $._for_header],
-    [$.object, $.object_pattern],
     [$.array, $.array_pattern],
+    [$.object, $.object_pattern],
     [$.assignment_expression, $.pattern],
-    [$.assignment_expression, $.rest_parameter],
     [$.assignment_expression, $.object_assignment_pattern],
     [$.labeled_statement, $._property_name],
     [$.computed_property_name, $.array],
@@ -285,8 +292,19 @@ module.exports = grammar({
 
     _for_header: $ => seq(
       '(',
-      optional(choice('var', 'let', 'const')),
-      field('left', choice($.parenthesized_expression, $._lhs_expression)),
+      choice(
+        field('left', choice(
+          $._lhs_expression,
+          $.parenthesized_expression,
+        )),
+        seq(
+          choice('var', 'let', 'const'),
+          field('left', choice(
+            $.identifier,
+            $._destructuring_pattern
+          ))
+        )
+      ),
       choice('in', 'of'),
       field('right', $._expressions),
       ')',
@@ -473,7 +491,7 @@ module.exports = grammar({
       '{',
       commaSep(optional(choice(
         $.pair_pattern,
-        $.rest_parameter,
+        $.rest_pattern,
         $.object_assignment_pattern,
         alias(
           choice($.identifier, $._reserved_identifier),
@@ -510,7 +528,8 @@ module.exports = grammar({
     array_pattern: $ => seq(
       '[',
       commaSep(optional(choice(
-        $.pattern
+        $.pattern,
+        $.assignment_pattern,
       ))),
       ']'
     ),
@@ -678,9 +697,8 @@ module.exports = grammar({
     )),
 
     // Override
-    _call_signature: $ => seq(
-      field('parameters', $.formal_parameters)
-    ),
+    _call_signature: $ => field('parameters', $.formal_parameters),
+    _formal_parameter: $ => choice($.pattern, $.assignment_pattern),
 
     call_expression: $ => choice(
       prec('call', seq(
@@ -792,7 +810,7 @@ module.exports = grammar({
         ['>', 'binary_relation'],
         ['??', 'ternary'],
         ['instanceof', 'binary_relation'],
-        ['in', 'binary_relation'],
+        ['in', 'binary_in'],
       ].map(([operator, precedence]) =>
         prec.left(precedence, seq(
           field('left', $._expression),
@@ -1030,7 +1048,7 @@ module.exports = grammar({
     formal_parameters: $ => seq(
       '(',
       optional(seq(
-        commaSep1($.pattern),
+        commaSep1($._formal_parameter),
         optional(',')
       )),
       ')'
@@ -1039,21 +1057,20 @@ module.exports = grammar({
     // This negative dynamic precedence ensures that during error recovery,
     // unfinished constructs are generally treated as literal expressions,
     // not patterns.
-    pattern: $ => prec.dynamic(-1, choice(
+    pattern: $ => prec('pattern', prec.dynamic(-1, choice(
       $.identifier,
       alias($._reserved_identifier, $.identifier),
       $._destructuring_pattern,
-      $.assignment_pattern,
-      $.rest_parameter
-    )),
+      $.rest_pattern
+    ))),
 
-    rest_parameter: $ => seq(
+    rest_pattern: $ => prec('rest', seq(
       '...',
       choice(
         $.identifier,
         $._destructuring_pattern,
       )
-    ),
+    )),
 
     method_definition: $ => seq(
       repeat(field('decorator', $.decorator)),
