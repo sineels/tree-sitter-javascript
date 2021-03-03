@@ -684,14 +684,6 @@
           {
             "type": "_expression",
             "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "member_expression",
-            "named": true
           }
         ]
       }
@@ -1811,14 +1803,6 @@
         "types": [
           {
             "type": "_expression",
-            "named": true
-          },
-          {
-            "type": "identifier",
-            "named": true
-          },
-          {
-            "type": "member_expression",
             "named": true
           }
         ]

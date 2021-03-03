@@ -40,7 +40,7 @@ module.exports = grammar({
     [
       'member',
       'call',
-      'unary',
+      $.update_expression,
       'unary_not',
       'unary_void',
       'binary_exp',
@@ -48,27 +48,21 @@ module.exports = grammar({
       'binary_plus',
       'binary_compare',
       'binary_relation',
+      'binary_in',
       'binary_and',
       'binary_or',
       'ternary',
-      'await',
-      'sequence',
-      'arrow',
+      $.await_expression,
+      $.sequence_expression,
+      $.arrow_function
     ],
-    [
-      'binary_in',
-      'await',
-      'arrow',
-    ],
-    ['rest', 'assign'],
-    ['assign', 'primary_expr'],
-    ['call', 'await', 'arrow'],
-    ['member', 'new', 'call', 'expr'],
+    [$.rest_pattern, 'assign'],
+    ['assign', $.primary_expression],
+    ['member', 'new', 'call', $._expression],
     ['declaration', 'literal'],
-    ['primary_expr', 'block', 'object'],
-    ['import_statement', 'import_expr'],
-    ['export_statement', 'primary_expr'],
-    ['pattern'],
+    [$.primary_expression, $.statement_block, 'object'],
+    [$.import_statement, $.import],
+    [$.export_statement, $.primary_expression],
   ],
 
   conflicts: $ => [
@@ -101,7 +95,7 @@ module.exports = grammar({
     // Export declarations
     //
 
-    export_statement: $ => prec('export_statement', choice(
+    export_statement: $ => choice(
       seq(
         'export',
         choice(
@@ -122,7 +116,7 @@ module.exports = grammar({
           )
         )
       ),
-    )),
+    ),
 
     export_clause: $ => seq(
       '{',
@@ -151,16 +145,16 @@ module.exports = grammar({
     // Import declarations
     //
 
-    import: $ => prec('import_expr', token('import')),
+    import: $ => token('import'),
 
-    import_statement: $ => prec('import_statement', seq(
+    import_statement: $ => seq(
       'import',
       choice(
         seq($.import_clause, $._from_clause),
         field('source', $.string)
       ),
       $._semicolon
-    )),
+    ),
 
     import_clause: $ => choice(
       $.namespace_import,
@@ -243,7 +237,7 @@ module.exports = grammar({
       optional($._initializer)
     ),
 
-    statement_block: $ => prec.right('block', seq(
+    statement_block: $ => prec.right(seq(
       '{',
       repeat($._statement),
       '}',
@@ -423,7 +417,7 @@ module.exports = grammar({
     ),
 
     _expression: $ => choice(
-      prec('expr', $.primary_expression),
+      $.primary_expression,
       $._jsx_element,
       $.jsx_fragment,
       $.assignment_expression,
@@ -438,13 +432,11 @@ module.exports = grammar({
     ),
 
     primary_expression: $ => choice(
-      prec('primary_expr', choice(
-        $.subscript_expression,
-        $.member_expression,
-        $.parenthesized_expression,
-        $.identifier,
-        alias($._reserved_identifier, $.identifier),
-      )),
+      $.subscript_expression,
+      $.member_expression,
+      $.parenthesized_expression,
+      $.identifier,
+      alias($._reserved_identifier, $.identifier),
       $.this,
       $.super,
       $.number,
@@ -680,7 +672,7 @@ module.exports = grammar({
       optional($._automatic_semicolon)
     )),
 
-    arrow_function: $ => prec('arrow', seq(
+    arrow_function: $ => seq(
       optional('async'),
       choice(
         field('parameter', choice(
@@ -694,7 +686,7 @@ module.exports = grammar({
         $._expression,
         $.statement_block
       ))
-    )),
+    ),
 
     // Override
     _call_signature: $ => field('parameters', $.formal_parameters),
@@ -718,10 +710,10 @@ module.exports = grammar({
       field('arguments', optional(prec.dynamic(1, $.arguments)))
     )),
 
-    await_expression: $ => prec('await', seq(
+    await_expression: $ => seq(
       'await',
       $._expression
-    )),
+    ),
 
     member_expression: $ => prec('member', seq(
       field('object', choice($._expression, $.primary_expression)),
@@ -835,7 +827,7 @@ module.exports = grammar({
       ))
     )),
 
-    update_expression: $ => prec.left('unary', choice(
+    update_expression: $ => prec.left(choice(
       seq(
         field('argument', $._expression),
         field('operator', choice('++', '--'))
@@ -846,11 +838,11 @@ module.exports = grammar({
       ),
     )),
 
-    sequence_expression: $ => prec('sequence', seq(
+    sequence_expression: $ => seq(
       field('left', $._expression),
       ',',
       field('right', choice($.sequence_expression, $._expression))
-    )),
+    ),
 
     //
     // Primitives
@@ -1057,20 +1049,20 @@ module.exports = grammar({
     // This negative dynamic precedence ensures that during error recovery,
     // unfinished constructs are generally treated as literal expressions,
     // not patterns.
-    pattern: $ => prec('pattern', prec.dynamic(-1, choice(
+    pattern: $ => prec.dynamic(-1, choice(
       $.identifier,
       alias($._reserved_identifier, $.identifier),
       $._destructuring_pattern,
       $.rest_pattern
-    ))),
+    )),
 
-    rest_pattern: $ => prec('rest', seq(
+    rest_pattern: $ => seq(
       '...',
       choice(
         $.identifier,
         $._destructuring_pattern,
       )
-    )),
+    ),
 
     method_definition: $ => seq(
       repeat(field('decorator', $.decorator)),
