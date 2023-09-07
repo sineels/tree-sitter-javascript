@@ -1,34 +1,34 @@
-name: CI
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - "**"
+이름 :   시
+온:
+  워크플로우디스패치 :
+  푸시 :
+  가지 :
+        -   명장
+ pull_request :
+  가지 :
+        -   "**"
 
-jobs:
-  test:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: true
-      matrix:
-        os: [macos-latest, ubuntu-latest]
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - run: npm install
-      - run: npm test
+직업:
+  시험 :
+  런온  :   ${{   matrix.os   }}
+  전략 :
+  고단한  :   참
+  매트릭스 :
+ os  :   [마코스 후기,  우분투 후기]
+  스텝 :
+        -   사용 :   액션/체크아웃@v3
+        -   사용 :   동작/설정-노드@v3
+  와 :
+  노드버  :   18
+        -   실행 :   npm설치
+       -  실행:  npm시험
 
-  test_windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - run: npm install
-      - run: npm run-script test-windows
+ test_windows :
+ 런온 :  창호 후기
+ 스텝 :
+       -  사용:  액션/체크아웃@v3
+       -  사용:  동작/설정-노드@v3
+ 와 :
+ 노드버 :  18
+       -  실행:  npm설치
+       -  실행: npm 실행 스크립트 테스트 윈도우
